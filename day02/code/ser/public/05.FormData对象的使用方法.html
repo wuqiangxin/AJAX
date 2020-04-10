@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+
+<body>
+	<!-- 创建普通的html表单 -->
+	<form id="form">
+		<input type="text" name="username">
+		<input type="password" name="password">
+		<input type="button" id="btn" value="提交">
+	</form>
+
+	<script>
+		let btn = document.getElementById('btn');
+
+		let form = document.getElementById('form');
+
+		btn.onclick = function () {
+
+			let formData = new FormData(form);
+			// FormData 这里的F一定要大写 不然就会报错
+
+			const xhr = new XMLHttpRequest();
+
+			xhr.open('post', '/formData');
+
+			xhr.send(formData);
+
+			xhr.onload = function () {
+
+				if (xhr.status == 200) {
+
+					console.log(xhr.responseText);
+
+				}
+			}
+		}
+	</script>
+</body>
+
+</html>

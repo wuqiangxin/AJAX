@@ -1,0 +1,3 @@
+Hello, Ajax !
+
+AJAX:  aynsc Javascript and XML(HTML)

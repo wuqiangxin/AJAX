@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+
+<body>
+	<h2>欢迎，这是public文件夹中的index.html文件</h2>
+
+	<script>
+		function formatData(data) {
+
+			let arr = [];
+			for (let attr in data) {
+
+				arr.push(`${attr}=${data[attr]}`);
+			}
+			return arr.join('&');
+		};
+
+		function ajax(options) {
+
+			let defausl = {
+				type: 'GET',
+				url: '',
+				data: {},
+				header: {
+					'Content-Type': 'application/x-www-form-urlencoded'
+				},
+				succese: function (data) {
+
+					console.log(data);
+				},
+				error: function (err) {
+					console.log(err);
+
+				}
+			};
+
+			// 使用options对象中的属性覆盖defaults对象中的属性
+			Object.assign(defausl, options);
+			// 对象解构
+			let {
+				type,
+				url,
+				data,
+				header,
+				succese,
+				error
+			} = defausl;
+
+			let params = formatData(data);
+
+			if (type.toUpperCase() == 'GET') {
+
+				url = `${url}?${params}`;
+			}
+			// step1 创建AJAX对象
+			const xhr = new XMLHttpRequest();
+			console.log(url);
+			// console.log(data);
+
+
+			// step2 给ajax配置信息
+			xhr.open(type, url);
+
+			// step3 发送请求
+			if (type.toUpperCase() == 'POST') {
+
+				let contenttype = header;
+				// 设置参数的类型
+				xhr.setRequestHeader('Content-Type', contenttype);
+
+				if (contenttype == 'application/json') {
+
+					xhr.send(JSON.stringify(data));
+				} else {
+					xhr.send(params);
+				}
+			} else {
+				xhr.send(null);
+			}
+
+			// 服务端发来的信息接受完成
+			xhr.onload = function () {
+
+				let contentType = xhr.getResponseHeader('Content-Type');
+
+				let responseText = xhr.responseText;
+
+				if (contentType.includes('application/json')) {
+
+					responseText = JSON.parse(responseText)
+				}
+
+				if (xhr.status == 200) {
+
+					// console.log(xhr.responseText);
+					succese(responseText, xhr);
+				} else {
+					error(responseText, xhr);
+				}
+
+			}
+		}
+
+		ajax({
+			url: '/first',
+			data: {
+				name: 'ifer',
+				age: 18
+			},
+			succese: function (data) {
+
+				console.log(data);
+			}
+		});
+	</script>
+</body>
+
+</html>

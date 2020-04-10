@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+
+<body>
+	<h2>欢迎，这是public文件夹中的index.html文件</h2>
+	<script>
+		function formatData(data) {
+			let arr = [];
+			for (let attr in data) {
+				arr.push(`${attr}=${data[attr]}`);
+			}
+			// arr => ['name=ifer', 'age=18']
+			return arr.join('&');
+		}
+
+		function ajax(options) {
+			let defaultOptions = {
+				type: 'GET',
+				url: '',
+				data: {},
+				header: {
+					'Content-Type': 'application/x-www-form-urlencoded'
+				},
+				success: function () {},
+				error: function (err) {
+					console.log(err);
+				}
+			};
+			// 会用 options 覆盖 defaultOptions  这是一种浅拷贝的方法
+			Object.assign(defaultOptions, options);
+
+			let {
+				type,
+				url,
+				success,
+				data,
+				header,
+				error
+			} = defaultOptions;
+
+			// url + '?name=ifer&age=18'
+
+			// 格式化 data 数据，把 { name: 'ifer'} 转成 name=ifer
+			let params = formatData(data);
+
+			// 根据请求类型修改 url
+			if (type.toUpperCase() === 'GET') {
+				url = `${url}?${params}`;
+			}
+			// console.log(url); // /first?=name=ifer&age=18
+
+			// Step1: 创建一个 AJAX 对象
+			let xhr = new XMLHttpRequest();
+			// Step2: 配置信息
+			xhr.open(type, url);
+			// Step3: 发送请求
+			if (type.toUpperCase() === 'POST') {
+				let contentType = header['Content-Type'];
+				// 设置请求内容类型
+				xhr.setRequestHeader('Content-Type', contentType);
+				// 如果是 application/json 的类型，需要把原始数据转成字符串再进行传递
+				if (contentType === 'application/json') {
+					xhr.send(JSON.stringify(data));
+				} else {
+					xhr.send(params); // name=ifer&age=18      JSON.stringify({name: 'ifer', age: 18})
+				}
+			} else {
+				xhr.send(null);
+			}
+			// Step4: 拿到响应结果
+			xhr.onload = function () {
+				let contentType = xhr.getResponseHeader('Content-Type');
+				let responseText = xhr.responseText;
+				// 如果服务端响应的是 JSON 格式的字符串，才需要转换
+				if (contentType.includes('application/json')) {
+					responseText = JSON.parse(responseText);
+				}
+
+				if (this.status === 200) {
+					// console.log(xhr.responseText);
+					success(responseText, xhr);
+				} else {
+					error(responseText, xhr);
+				}
+			};
+		}
+		ajax({
+			url: '/first',
+			data: {
+				name: 'ifer',
+				age: 18
+			},
+			success: function (data) {
+				console.log(data);
+			}
+		});
+	</script>
+</body>
+
+</html>

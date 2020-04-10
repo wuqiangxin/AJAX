@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+
+<body>
+	<h2>欢迎，这是public文件夹中的index.html文件</h2>
+	<script>
+		// 传递参数！
+		function formatData(data) {
+			let arr = [];
+			for (let attr in data) {
+				arr.push(`${attr}=${data[attr]}`);
+			}
+			// arr => ['name=ifer', 'age=18']
+			return arr.join('&')
+		}
+
+		function ajax(options) {
+			let {
+				type,
+				url,
+				success,
+				data
+			} = options;
+
+			// url + '?name=ifer&age=18'
+
+			// 格式化 data 数据，把 { name: 'ifer'} 转成 name=ifer
+			let params = formatData(data);
+
+			// 根据请求类型修改 url
+			if (type.toUpperCase() === 'GET') {
+				url = `${url}?${params}`;
+			}
+			// console.log(url); // /first?=name=ifer&age=18
+
+			// Step1: 创建一个 AJAX 对象
+			let xhr = new XMLHttpRequest();
+			console.log(url);
+			// Step2: 配置信息
+			xhr.open(type, url);
+			// Step3: 发送请求
+			if (type.toUpperCase() === 'POST') {
+				// 设置请求类型 必须要写的类型绝对不能少
+				xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+				xhr.send(params);
+			} else {
+				xhr.send(null);
+			}
+			// Step4: 拿到响应结果
+			xhr.onload = function () {
+				// console.log(xhr.responseText);
+				success(xhr.responseText);
+			};
+		}
+		// 调用ajax函数
+		ajax({
+			type: 'GET',
+			url: '/first',
+			data: {
+				name: 'ifer',
+				age: 18
+			},
+			success: function (data) {
+				console.log(data);
+			}
+		});
+	</script>
+</body>
+
+</html>
